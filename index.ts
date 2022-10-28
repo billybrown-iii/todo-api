@@ -19,6 +19,16 @@ app.get("/api/todos", (req, res) => {
   })
 })
 
+app.get("/api/todos/:id", (req, res, next) => {
+  const id = req.params.id
+  Todo.findById(id)
+    .then(result => {
+      if (!result) return res.status(404).json({ message: "Todo not found" })
+      res.json(result)
+    })
+    .catch(err => next(err))
+})
+
 app.post("/api/todos", (req, res, next) => {
   const newTodo = new Todo(req.body)
   newTodo.isCompleted = false
@@ -26,6 +36,15 @@ app.post("/api/todos", (req, res, next) => {
     .save()
     .then(result => {
       res.status(201).json(result)
+    })
+    .catch(err => next(err))
+})
+
+app.put("/api/todos/:id", (req, res, next) => {
+  // this only needs to pass in the changed parts, not the whole todo obj
+  Todo.findByIdAndUpdate(req.params.id, req.body, { runValidators: true })
+    .then(result => {
+      res.status(200).json(result)
     })
     .catch(err => next(err))
 })
@@ -41,6 +60,8 @@ app.delete("/api/todos", (req, res, next) => {
 const errorHandler = (err, req, res, next) => {
   if (err.name === "ValidatorError" || err.name === "ValidationError")
     return res.status(400).json({ message: err.message })
+
+  if (err.name === "CastError") return res.status(400).json({ message: "Malformed Id" })
 
   // shouldn't reach this part
   console.error(err)
