@@ -5,7 +5,7 @@ require("dotenv").config();
 const uri = `mongodb+srv://link8495:${process.env.mongopw}@cluster0.twjtj.mongodb.net/todos?retryWrites=true&w=majority`;
 mongoose
     .connect(uri)
-    .then(res => {
+    .then(result => {
     console.log("Connected to MongoDB");
 })
     .catch(err => {
@@ -21,9 +21,9 @@ const todoSchema = new mongoose.Schema({
         type: String,
         validate: {
             validator: v => {
-                return /^(Important|Backburner)$/.test(v);
+                return /^(Urgent|Backburner)$/.test(v);
             },
-            message: "Priority must be 'Important' or 'Backburner'",
+            message: "Priority must be 'Urgent' or 'Backburner'",
         },
         required: true,
     },
@@ -31,6 +31,6 @@ const todoSchema = new mongoose.Schema({
         type: Boolean,
         required: true,
     },
-});
+}, { strict: "throw" });
 const Todo = mongoose.model("Todo", todoSchema);
 exports.default = Todo;

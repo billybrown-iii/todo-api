@@ -2,10 +2,11 @@
   "name": "todo-api",
   "version": "1.0.0",
   "description": "Practice project - backend for todo app",
-  "main": "./out/index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "test": "jest",
-    "dev": "nodemon index.ts"
+    "dev": "nodemon index.ts",
+    "build": "npx tsc; node ./dist/index.js"
   },
   "author": "Billy B",
   "license": "ISC",

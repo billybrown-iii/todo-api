@@ -32,10 +32,9 @@ app.get("/api/todos/:id", (req, res, next) => {
 })
 
 app.post("/api/todos", (req, res, next) => {
-  const newTodo = new Todo(req.body)
+  const newTodo = { ...req.body }
   newTodo.isCompleted = false
-  newTodo
-    .save()
+  Todo.create(newTodo)
     .then(result => {
       res.status(201).json(result)
     })
@@ -79,18 +78,22 @@ app.get("/info", (req, res, next) => {
     <div>Request made at ${new Date()}</div>
       `)
     })
-    .catch(err => next(err))
+    .catch(err => next)
 })
 
 const errorHandler = (err, req, res, next) => {
-  // triggers when the mongoose validations fail
+  // occurs when the mongoose validations fail
   if (err.name === "ValidatorError" || err.name === "ValidationError")
     return res.status(400).json({ message: err.message })
 
   // CastError occurs when searching for a malformed Id (an Id of an incorrect format/length)
   if (err.name === "CastError") return res.status(400).json({ message: "Malformed Id" })
 
+  // occurs when invalid properties are passed to a Todo object
+  if (err.name === "StrictModeError") return res.status(400).json({ message: err.message })
+
   // shouldn't reach this part
+  console.log("Unhandled error in errorHandler function - index.ts")
   console.error(err)
   res.status(404).end()
 }
